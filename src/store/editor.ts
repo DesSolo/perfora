@@ -6,7 +6,7 @@ import { commitFrom, initHistory, push, redo, replace, undo, type History } from
 import type { Block, Project } from '../core/model';
 import * as ops from '../core/ops';
 import { importImage, isImageFile } from '../assets/importImage';
-import { putAsset } from '../assets/registry';
+import { clearAssets, putAsset } from '../assets/registry';
 import { detectLang, saveLang, translate, type Lang, type MessageKey } from '../i18n';
 import { isValidPreset, presetFromBinding, type BindingPreset } from '../core/bindingPresets';
 import { newId } from '../core/ids';
@@ -46,7 +46,13 @@ function saveJson(key: string, value: unknown): void {
   }
 }
 
+export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
+
 export interface EditorState {
+  /** Ключ проекта в IndexedDB. В сам Project не входит: при импорте zip выдаётся новый. */
+  projectId: string;
+  saveStatus: SaveStatus;
+  projectsOpen: boolean;
   history: History<Project>;
   currentPageId: string;
   selectedBlockId: string | null;
@@ -67,6 +73,11 @@ export interface EditorState {
 
   gestureBase: Project | null;
   lastCommit: { key: string; t: number } | null;
+
+  /** Открыть другой проект: история, выделение и картинки сессии сбрасываются. */
+  openProject(id: string, project: Project, blobs?: Map<string, Blob>): void;
+  setSaveStatus(s: SaveStatus): void;
+  setProjectsOpen(v: boolean): void;
 
   apply(fn: (p: Project) => Project, coalesceKey?: string): void;
   beginGesture(): void;
@@ -131,6 +142,9 @@ export const useEditor = create<EditorState>()((set, get) => {
   }
 
   return {
+    projectId: newId('j'),
+    saveStatus: 'idle',
+    projectsOpen: false,
     history: initHistory(initial),
     currentPageId: initial.pages[0].id,
     selectedBlockId: null,
@@ -147,6 +161,28 @@ export const useEditor = create<EditorState>()((set, get) => {
     userPresets: loadJson<unknown[]>('ris.presets', []).filter(isValidPreset),
     gestureBase: null,
     lastCommit: null,
+
+    openProject(projectId, project, blobs) {
+      clearAssets();
+      for (const [id, blob] of blobs ?? []) putAsset(id, blob);
+      set({
+        projectId,
+        history: initHistory(project),
+        currentPageId: project.pages[0].id,
+        selectedBlockId: null,
+        editingBlockId: null,
+        gestureBase: null,
+        lastCommit: null,
+        guides: null,
+        saveStatus: 'idle',
+      });
+    },
+    setSaveStatus(saveStatus) {
+      set({ saveStatus });
+    },
+    setProjectsOpen(projectsOpen) {
+      set({ projectsOpen });
+    },
 
     apply(fn, coalesceKey) {
       const s = get();

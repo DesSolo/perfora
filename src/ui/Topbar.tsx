@@ -6,6 +6,7 @@ import type { ViewPrefs } from '../store/editor';
 import type { IconName } from './icons';
 import type { MessageKey } from '../i18n';
 import { Icon } from './icons';
+import { SaveStatus } from './Projects';
 
 export function Topbar() {
   const t = useT();
@@ -19,6 +20,9 @@ export function Topbar() {
 
   return (
     <header className="topbar">
+      <button className="icon-btn" title={t('projects.open')} aria-label={t('projects.title')} onClick={() => s.setProjectsOpen(true)}>
+        <Icon name="folder" />
+      </button>
       <span className="brand">{t('app.title')}</span>
       <input
         className="project-name"
@@ -30,6 +34,7 @@ export function Topbar() {
           s.apply((p) => ({ ...p, name }), 'name');
         }}
       />
+      <SaveStatus />
       <div className="icon-row">
         <button className="icon-btn" title={`${t('action.undo')} (Ctrl+Z)`} disabled={!canUndo} onClick={() => s.undo()}>
           <Icon name="undo" />

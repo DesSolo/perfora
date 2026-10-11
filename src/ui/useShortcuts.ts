@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { useEditor } from '../store/editor';
 import { printProject } from './Print';
+import { flushSave } from '../persist/session';
+import { translate } from '../i18n';
 
 function isTyping(target: EventTarget | null): boolean {
   const el = target as HTMLElement | null;
@@ -20,6 +22,20 @@ export function useShortcuts() {
       if (mod && e.code === 'KeyP') {
         e.preventDefault();
         void printProject();
+        return;
+      }
+      // Ctrl+S: сохранение и так автоматическое, просто дописываем сразу.
+      if (mod && e.code === 'KeyS') {
+        e.preventDefault();
+        void flushSave().then(() => {
+          const st = useEditor.getState();
+          if (st.saveStatus !== 'error') st.setNotice(translate(st.lang, 'save.saved'));
+        });
+        return;
+      }
+      if (mod && e.code === 'KeyO') {
+        e.preventDefault();
+        useEditor.getState().setProjectsOpen(true);
         return;
       }
       if (isTyping(e.target)) return;

@@ -21,3 +21,9 @@ export function assetUrl(id: string): string | undefined {
 export function assetBlob(id: string): Blob | undefined {
   return entries.get(id)?.blob;
 }
+
+/** Забыть все картинки (при переходе к другому проекту: его история с текущей не связана). */
+export function clearAssets(): void {
+  for (const e of entries.values()) URL.revokeObjectURL(e.url);
+  entries.clear();
+}

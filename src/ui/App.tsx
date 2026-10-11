@@ -3,6 +3,7 @@ import { useEditor } from '../store/editor';
 import { Canvas } from './Canvas';
 import { Inspector } from './Inspector';
 import { PagesPanel } from './PagesPanel';
+import { ProjectsDialog } from './Projects';
 import { PrintPreview, PrintRoot, usePrintEvents } from './Print';
 import { Topbar } from './Topbar';
 import { useShortcuts } from './useShortcuts';
@@ -39,6 +40,7 @@ export function App() {
       </div>
       <Notice />
       <PrintPreview />
+      <ProjectsDialog />
       <PrintRoot />
     </div>
   );

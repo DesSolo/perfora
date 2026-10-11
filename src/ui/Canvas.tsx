@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { spreadOf } from '../core/geometry/spread';
 import { PX_PER_MM } from '../core/units';
+import { importProjectFile, isZipFile } from '../persist/session';
 import { useEditor, useProject, useT } from '../store/editor';
 import { EditorPage } from './EditorPage';
 
@@ -95,7 +96,11 @@ export function Canvas() {
         if (!hasFiles(e)) return;
         e.preventDefault();
         setDropping(false);
-        void useEditor.getState().addImages([...e.dataTransfer.files]);
+        const files = [...e.dataTransfer.files];
+        // Перетащили сохранённый проект — открываем его как новый.
+        const zip = files.find(isZipFile);
+        if (zip) void importProjectFile(zip);
+        else void useEditor.getState().addImages(files);
       }}
     >
       <div className="canvas-inner" style={{ padding: PADDING_PX }}>

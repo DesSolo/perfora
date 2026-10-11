@@ -33,6 +33,9 @@ const PATHS = {
   grid: 'M4 4h16v16H4zM4 9.3h16M4 14.6h16M9.3 4v16M14.6 4v16',
   magnet: 'M6 4v7a6 6 0 0 0 12 0V4h-4v7a2 2 0 0 1-4 0V4zM6 8h4M14 8h4',
   print: 'M7 9V3h10v6M7 17H4v-7h16v7h-3M7 14h10v7H7z',
+  folder: 'M3 6h6l2 2h10v11H3z',
+  download: 'M12 4v11M7 10l5 5 5-5M5 20h14',
+  upload: 'M12 15V4M7 9l5-5 5 5M5 20h14',
   eye: 'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z',
 } as const;
 
