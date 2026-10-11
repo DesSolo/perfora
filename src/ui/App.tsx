@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useEditor } from '../store/editor';
+import { CalibrationDialog } from './Calibration';
 import { Canvas } from './Canvas';
 import { Inspector } from './Inspector';
 import { PagesPanel } from './PagesPanel';
@@ -41,6 +42,7 @@ export function App() {
       <Notice />
       <PrintPreview />
       <ProjectsDialog />
+      <CalibrationDialog />
       <PrintRoot />
     </div>
   );

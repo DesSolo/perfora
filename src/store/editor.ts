@@ -11,6 +11,7 @@ import { detectLang, saveLang, translate, type Lang, type MessageKey } from '../
 import { isValidPreset, presetFromBinding, type BindingPreset } from '../core/bindingPresets';
 import { newId } from '../core/ids';
 import type { Guides } from '../core/geometry/snap';
+import { DEFAULT_JOB, type PrintJobOptions } from '../core/geometry/imposition';
 
 /** Подряд идущие однотипные правки (стрелки, ввод в поле) сливаются в один шаг истории. */
 const COALESCE_MS = 800;
@@ -68,7 +69,12 @@ export interface EditorState {
   guides: Guides | null;
   /** Смонтирован печатный рендер (на время печати). */
   printing: boolean;
+  /** Что печатается: проект или тестовый лист калибровки. */
+  printTarget: 'project' | 'calibration';
+  /** Выбор сторон и порядка на время сессии: для ручного дуплекса. */
+  printJob: PrintJobOptions;
   previewOpen: boolean;
+  calibrationOpen: boolean;
   userPresets: BindingPreset[];
 
   gestureBase: Project | null;
@@ -95,8 +101,10 @@ export interface EditorState {
   setNotice(msg: string | null): void;
   setView(patch: Partial<ViewPrefs>): void;
   setGuides(g: Guides | null): void;
-  setPrinting(v: boolean): void;
+  setPrinting(v: boolean, target?: EditorState['printTarget']): void;
+  setPrintJob(patch: Partial<PrintJobOptions>): void;
   setPreviewOpen(v: boolean): void;
+  setCalibrationOpen(v: boolean): void;
   saveUserPreset(name: string): void;
   deleteUserPreset(id: string): void;
 
@@ -157,7 +165,10 @@ export const useEditor = create<EditorState>()((set, get) => {
     view: { ...DEFAULT_VIEW, ...loadJson<Partial<ViewPrefs>>('ris.view', {}) },
     guides: null,
     printing: false,
+    printTarget: 'project',
+    printJob: DEFAULT_JOB,
     previewOpen: false,
+    calibrationOpen: false,
     userPresets: loadJson<unknown[]>('ris.presets', []).filter(isValidPreset),
     gestureBase: null,
     lastCommit: null,
@@ -249,11 +260,17 @@ export const useEditor = create<EditorState>()((set, get) => {
     setGuides(guides) {
       set({ guides });
     },
-    setPrinting(printing) {
-      set({ printing });
+    setPrinting(printing, printTarget = 'project') {
+      set({ printing, printTarget });
+    },
+    setPrintJob(patch) {
+      set({ printJob: { ...get().printJob, ...patch } });
     },
     setPreviewOpen(previewOpen) {
       set({ previewOpen });
+    },
+    setCalibrationOpen(calibrationOpen) {
+      set({ calibrationOpen });
     },
     saveUserPreset(name) {
       const preset = presetFromBinding(newId('u'), name, project().binding);

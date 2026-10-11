@@ -6,8 +6,9 @@ import { matchPageSize, PAGE_SIZES } from '../core/presets';
 import { IMAGE_DPI_OPTIONS } from '../assets/importImage';
 import { applyPreset, BUILTIN_PRESETS, matchPreset, presetName } from '../core/bindingPresets';
 import { hitsKeepOut, holeCenters, requiredFlip } from '../core/geometry/binding';
-import type { Binding, PrintSettings } from '../core/model';
-import { printProject } from './Print';
+import type { Binding, ImpositionSheet, PrintSettings } from '../core/model';
+import { printProject, PrintJobControls } from './Print';
+import { cropMarks, hasBackSides, maxGrid, printSheetSize, sheetLayout, sheetSize } from '../core/geometry/imposition';
 import { useEditor, useProject, useT } from '../store/editor';
 import { Icon, type IconName } from './icons';
 import { NumberField } from './NumberField';
@@ -339,7 +340,7 @@ function PrintSection() {
   const s = useEditor.getState();
   const { print, binding } = project;
   const set = (patch: Partial<PrintSettings>) => s.apply((p) => ops.setPrint(p, patch));
-  const need = requiredFlip(binding.side, project.page);
+  const need = requiredFlip(binding.side, printSheetSize(project));
 
   return (
     <Section title={t('print.title')} collapsible>
@@ -368,6 +369,8 @@ function PrintSection() {
           <p className={print.duplexFlip === need ? 'hint' : 'warning'}>{t('print.flipHint', { flip: t(`flip.${need}`).toLowerCase() })}</p>
         </>
       )}
+      <PrintJobControls />
+      {hasBackSides(project) && <p className="hint">{t('job.hint')}</p>}
       <div className="icon-row">
         <button className="btn" onClick={() => s.setPreviewOpen(true)}>
           {t('print.preview')}
@@ -377,6 +380,119 @@ function PrintSection() {
         </button>
       </div>
       <p className="hint">{t('print.hint')}</p>
+    </Section>
+  );
+}
+
+const SHEETS = ['A4', 'Letter', 'custom'] as const;
+
+function ImpositionSection() {
+  const t = useT();
+  const project = useProject();
+  const s = useEditor.getState();
+  const { print } = project;
+  const im = print.imposition;
+  const layout = sheetLayout(project);
+  const setIm = (patch: Partial<NonNullable<PrintSettings['imposition']>> | null, key?: string) =>
+    s.apply((p) => ops.setPrint(p, { imposition: patch && p.print.imposition ? { ...p.print.imposition, ...patch } : null }), key && `imposition-${key}`);
+  const enable = () => {
+    const grid = maxGrid('A4', project.page, 0) ?? { cols: 1, rows: 1 };
+    s.apply((p) => ops.setPrint(p, { imposition: { sheet: 'A4', gap: 0, ...grid } }));
+  };
+  const custom = im && typeof im.sheet === 'object' ? im.sheet : null;
+  const setSheet = (sheet: ImpositionSheet, key?: string) => setIm({ sheet }, key);
+
+  return (
+    <Section title={t('imposition.title')} collapsible>
+      <label className="check">
+        <input type="checkbox" checked={!!im} onChange={(e) => (e.target.checked ? enable() : setIm(null))} />
+        <span>{t('imposition.enabled')}</span>
+      </label>
+      {im && layout && (
+        <>
+          <label className="field">
+            <span>{t('imposition.sheet')}</span>
+            <select
+              value={custom ? 'custom' : (im.sheet as string)}
+              onChange={(e) => {
+                const v = e.target.value as (typeof SHEETS)[number];
+                if (v !== 'custom') return setSheet(v);
+                const size = sheetSize(im.sheet);
+                setSheet({ w: size.width, h: size.height });
+              }}
+            >
+              {SHEETS.map((v) => (
+                <option key={v} value={v}>
+                  {v === 'custom' ? t('inspector.custom') : v}
+                </option>
+              ))}
+            </select>
+          </label>
+          {custom && (
+            <div className="field-row">
+              <NumberField label={t('inspector.width')} value={custom.w} min={10} max={2000} onChange={(w) => setSheet({ ...custom, w }, 'w')} />
+              <NumberField label={t('inspector.height')} value={custom.h} min={10} max={2000} onChange={(h) => setSheet({ ...custom, h }, 'h')} />
+            </div>
+          )}
+          <div className="field-row">
+            <NumberField label={t('imposition.cols')} value={im.cols} min={1} max={20} step={1} digits={0} onChange={(v) => setIm({ cols: Math.round(v) }, 'cols')} />
+            <NumberField label={t('imposition.rows')} value={im.rows} min={1} max={20} step={1} digits={0} onChange={(v) => setIm({ rows: Math.round(v) }, 'rows')} />
+          </div>
+          <div className="field-row">
+            <NumberField label={t('imposition.gap')} value={im.gap} min={0} max={100} step={0.5} onChange={(v) => setIm({ gap: v }, 'gap')} />
+            <button
+              className="btn small"
+              onClick={() => {
+                const grid = maxGrid(im.sheet, project.page, im.gap);
+                if (grid) setIm(grid);
+              }}
+            >
+              {t('imposition.max')}
+            </button>
+          </div>
+          <p className={layout.fits ? 'hint' : 'warning'} data-testid="imposition-status">
+            {layout.fits
+              ? t('imposition.status', {
+                  w: +layout.sheet.width.toFixed(1),
+                  h: +layout.sheet.height.toFixed(1),
+                  o: t(layout.landscape ? 'inspector.landscape' : 'inspector.portrait').toLowerCase(),
+                  n: layout.cells.length,
+                })
+              : t('imposition.noFit')}
+          </p>
+        </>
+      )}
+      <label className="check">
+        <input type="checkbox" checked={print.cropMarks} disabled={!im} onChange={(e) => s.apply((p) => ops.setPrint(p, { cropMarks: e.target.checked }))} />
+        <span>{t('imposition.cropMarks')}</span>
+      </label>
+      {!im && <p className="hint">{t('imposition.cropHint')}</p>}
+      {im && layout && print.cropMarks && cropMarks(layout).length === 0 && <p className="warning">{t('imposition.cropNoRoom')}</p>}
+    </Section>
+  );
+}
+
+function CalibrationSection() {
+  const t = useT();
+  const project = useProject();
+  const s = useEditor.getState();
+  const { offsetFront, offsetBack } = project.print;
+  const set = (key: 'offsetFront' | 'offsetBack', patch: Partial<typeof offsetFront>) =>
+    s.apply((p) => ops.setPrint(p, { [key]: { ...p.print[key], ...patch } }), `${key}-${Object.keys(patch)[0]}`);
+  return (
+    <Section title={t('calib.title')} collapsible>
+      <span className="field-caption">{t('calib.offsets')}</span>
+      <div className="field-row">
+        <NumberField label={t('calib.frontX')} value={offsetFront.x} min={-50} max={50} step={0.1} digits={1} onChange={(x) => set('offsetFront', { x })} />
+        <NumberField label={t('calib.frontY')} value={offsetFront.y} min={-50} max={50} step={0.1} digits={1} onChange={(y) => set('offsetFront', { y })} />
+      </div>
+      <div className="field-row">
+        <NumberField label={t('calib.backX')} value={offsetBack.x} min={-50} max={50} step={0.1} digits={1} onChange={(x) => set('offsetBack', { x })} />
+        <NumberField label={t('calib.backY')} value={offsetBack.y} min={-50} max={50} step={0.1} digits={1} onChange={(y) => set('offsetBack', { y })} />
+      </div>
+      <button className="btn" onClick={() => s.setCalibrationOpen(true)}>
+        {t('calib.open')}
+      </button>
     </Section>
   );
 }
@@ -463,6 +579,8 @@ export function Inspector() {
       <MarginsSection />
       <BindingSection />
       <PrintSection />
+      <ImpositionSection />
+      <CalibrationSection />
       <ImportSection />
     </aside>
   );

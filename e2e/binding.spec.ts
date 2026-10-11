@@ -132,7 +132,7 @@ test('оборот поворачивается на 180°, если принт�
     await page.evaluate(() => (window as unknown as Win).preparePrint());
     return page
       .getByTestId('print-root')
-      .locator('.print-page-inner')
+      .locator('.print-slot')
       .evaluateAll((els) => els.map((e) => (e as HTMLElement).style.transform));
   };
   expect(await rotations()).toEqual(['', '']);
