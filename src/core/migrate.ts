@@ -21,8 +21,13 @@ type Raw = Record<string, unknown>;
 /** Переводит сырой объект схемы n в схему n + 1. */
 export type Migration = (raw: Raw) => Raw;
 
-/** MIGRATIONS[n] — шаг n → n + 1. Схема 1 первая, шагов пока нет. */
-export const MIGRATIONS: Record<number, Migration> = {};
+/** MIGRATIONS[n] — шаг n → n + 1. */
+export const MIGRATIONS: Record<number, Migration> = {
+  // 2: появились неравные промежутки `binding.holes.gaps`. Проекты схемы 1 с равным шагом
+  // остаются как есть; версия поднята, чтобы старое приложение не открыло новый файл и
+  // не потеряло промежутки молча.
+  1: (r) => r,
+};
 
 export type ProjectErrorCode = 'invalid' | 'newer' | 'noMigration';
 
@@ -174,6 +179,12 @@ function parseBinding(v: unknown, def: Binding): Binding {
     centered: bool(h.centered, def.holes.centered),
   };
   if (isNum(h.firstHoleOffset)) holes.firstHoleOffset = h.firstHoleOffset;
+  // Промежутки берём, только если они согласованы с числом отверстий. Без числа
+  // отверстий в файле подставляются и промежутки по умолчанию.
+  const gaps: unknown = h.gaps ?? (h.count === undefined ? def.holes.gaps : undefined);
+  if (Array.isArray(gaps) && gaps.length > 0 && gaps.length === holes.count - 1 && gaps.every((g) => isNum(g) && g > 0)) {
+    holes.gaps = [...(gaps as number[])];
+  }
   return {
     enabled: bool(b.enabled, def.enabled),
     side: oneOf(b.side, ['left', 'right', 'top'] as const, def.side),

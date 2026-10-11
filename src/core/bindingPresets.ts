@@ -3,6 +3,7 @@
 import presetsJson from '../data/presets.json';
 import type { Binding, Mm, Project } from './model';
 import { produce } from 'immer';
+import { holeGaps } from './geometry/binding';
 
 export interface BindingPreset {
   id: string;
@@ -33,6 +34,7 @@ export function isValidPreset(v: unknown): v is BindingPreset {
     isNum(h.pitch) &&
     isNum(h.offsetFromEdge) &&
     typeof h.centered === 'boolean' &&
+    (h.gaps === undefined || (Array.isArray(h.gaps) && h.gaps.length === h.count - 1 && h.gaps.every((g) => isNum(g) && g > 0))) &&
     (p.page === undefined || (isNum(p.page.width) && isNum(p.page.height)))
   );
 }
@@ -62,7 +64,7 @@ export function applyPreset(project: Project, preset: BindingPreset): Project {
 /** Пресет, совпадающий с текущими настройками переплёта, или null («Произвольный»). */
 export function matchPreset(binding: Binding, presets: BindingPreset[]): BindingPreset | null {
   const key = (b: Pick<Binding, 'side' | 'holes' | 'keepOutPadding'>) =>
-    JSON.stringify([b.side, b.keepOutPadding, b.holes.count, b.holes.diameter, b.holes.pitch, b.holes.offsetFromEdge, b.holes.centered, b.holes.centered ? null : (b.holes.firstHoleOffset ?? 0)]);
+    JSON.stringify([b.side, b.keepOutPadding, b.holes.count, b.holes.diameter, holeGaps(b.holes), b.holes.offsetFromEdge, b.holes.centered, b.holes.centered ? null : (b.holes.firstHoleOffset ?? 0)]);
   const k = key(binding);
   return presets.find((p) => key(p.binding) === k) ?? null;
 }

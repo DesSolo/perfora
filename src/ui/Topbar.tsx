@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { useEditor, useProject, useT } from '../store/editor';
+import { THEMES, useEditor, useProject, useT, type Theme } from '../store/editor';
 import { fitCurrent } from './Canvas';
 import { printProject } from './Print';
 import type { ViewPrefs } from '../store/editor';
@@ -15,6 +15,7 @@ export function Topbar() {
   const canRedo = useEditor((s) => s.history.future.length > 0);
   const zoom = useEditor((s) => s.zoom);
   const lang = useEditor((s) => s.lang);
+  const theme = useEditor((s) => s.theme);
   const s = useEditor.getState();
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -92,12 +93,22 @@ export function Topbar() {
           <Icon name="print" /> {t('print.print')}
         </button>
       </div>
+      <button
+        className="icon-btn"
+        title={t(`theme.${theme}`)}
+        aria-label={t(`theme.${theme}`)}
+        onClick={() => s.setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length])}
+      >
+        <Icon name={THEME_ICONS[theme]} />
+      </button>
       <button className="btn lang" title={t('action.language')} onClick={() => s.setLang(lang === 'ru' ? 'en' : 'ru')}>
         {lang === 'ru' ? 'EN' : 'RU'}
       </button>
     </header>
   );
 }
+
+const THEME_ICONS: Record<Theme, IconName> = { system: 'themeAuto', light: 'sun', dark: 'moon' };
 
 const TOGGLES: { key: Exclude<keyof ViewPrefs, 'spread'>; icon: IconName; label: MessageKey }[] = [
   { key: 'margins', icon: 'margins', label: 'view.margins' },

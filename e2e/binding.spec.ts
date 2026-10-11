@@ -141,3 +141,26 @@ test('оборот поворачивается на 180°, если принт�
   );
   expect(await rotations()).toEqual(['', 'rotate(180deg)']);
 });
+
+test('пресет с неравными промежутками и правка промежутков', async ({ page }) => {
+  await setup(page, 1);
+  const cy = () =>
+    page.locator('[data-page-index="0"] .editor-overlay circle.hole').evaluateAll((els) => els.map((e) => Number(e.getAttribute('cy'))));
+  await page.getByLabel('Пресет').selectOption('a5-4-45-65');
+  await expect(page.getByText('Размеры из справочника')).toBeVisible();
+  await expect(page.getByLabel('Неравные промежутки')).toBeChecked();
+  const gaps = page.getByLabel('Промежутки между центрами, мм');
+  await expect(gaps).toHaveValue('45-65-45');
+  // Размах 155 мм по центру высоты 210.
+  expect(await cy()).toEqual([27.5, 72.5, 137.5, 182.5]);
+
+  await gaps.fill('19-19-70-19-19');
+  await gaps.press('Enter');
+  expect((await project(page)).binding.holes).toMatchObject({ count: 6, gaps: [19, 19, 70, 19, 19] });
+  // Те же диаметр и отступ — это пресет Filofax A5.
+  await expect(page.getByLabel('Пресет')).toHaveValue('a5-6-70');
+
+  await page.getByLabel('Неравные промежутки').uncheck();
+  expect((await project(page)).binding.holes).not.toHaveProperty('gaps');
+  await expect(page.getByLabel('Шаг, мм')).toBeVisible();
+});

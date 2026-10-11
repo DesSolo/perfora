@@ -1,15 +1,142 @@
 {
-  "version": 1,
+  "version": 2,
   "binding": [
     {
-      "id": "test-a5-6",
-      "name": { "ru": "A5, 6 отверстий (проверить)", "en": "A5, 6 holes (to verify)" },
+      "id": "iso-838-2",
+      "name": { "ru": "ISO 838, 2 отверстия (80 мм)", "en": "ISO 838, 2 holes (80 mm)" },
+      "source": "ISO 838: шаг 80 ± 0,5, Ø 6 ± 0,5, от края 12 ± 1",
+      "binding": {
+        "side": "left",
+        "holes": { "count": 2, "diameter": 6, "pitch": 80, "offsetFromEdge": 12, "centered": true },
+        "keepOutPadding": 2
+      }
+    },
+    {
+      "id": "a4-4-888",
+      "name": { "ru": "A4, 4 кольца 80-80-80", "en": "A4, 4 rings 80-80-80" },
+      "source": "Расширение ISO 838 («888»): Chronoplan, Filofax A4, Quo Vadis 29",
+      "page": { "width": 210, "height": 297 },
+      "binding": {
+        "side": "left",
+        "holes": { "count": 4, "diameter": 6, "pitch": 80, "offsetFromEdge": 12, "centered": true },
+        "keepOutPadding": 2
+      }
+    },
+    {
+      "id": "a4-30-j",
+      "name": { "ru": "A4, 30 колец (японский, шаг 9,5)", "en": "A4, 30 rings (Japanese, 9.5 pitch)" },
+      "source": "J-binder / Kokuyo: шаг 9,5, Ø 5,5, от края до центра 6,25",
+      "page": { "width": 210, "height": 297 },
+      "binding": {
+        "side": "left",
+        "holes": { "count": 30, "diameter": 5.5, "pitch": 9.5, "offsetFromEdge": 6.25, "centered": true },
+        "keepOutPadding": 1
+      }
+    },
+    {
+      "id": "b5-26-j",
+      "name": { "ru": "B5, 26 колец (японский, шаг 9,5)", "en": "B5, 26 rings (Japanese, 9.5 pitch)" },
+      "source": "J-binder / Kokuyo, JIS B5 182 × 257",
+      "page": { "width": 182, "height": 257 },
+      "binding": {
+        "side": "left",
+        "holes": { "count": 26, "diameter": 5.5, "pitch": 9.5, "offsetFromEdge": 6.25, "centered": true },
+        "keepOutPadding": 1
+      }
+    },
+    {
+      "id": "a5-20-j",
+      "name": { "ru": "A5, 20 колец (шаг 9,5)", "en": "A5, 20 rings (9.5 pitch)" },
+      "source": "J-binder A5, тот же шаг, что A4/B5",
+      "page": { "width": 148, "height": 210 },
+      "binding": {
+        "side": "left",
+        "holes": { "count": 20, "diameter": 5.5, "pitch": 9.5, "offsetFromEdge": 6.25, "centered": true },
+        "keepOutPadding": 1
+      }
+    },
+    {
+      "id": "a5-6-70",
+      "name": { "ru": "A5, 6 колец 19-19-70-19-19 (Filofax)", "en": "A5, 6 rings 19-19-70-19-19 (Filofax)" },
+      "source": "hjreggel.net: Filofax, Chronoplan, Succes, Time/system. Отступ от края не опубликован",
       "verify": true,
       "page": { "width": 148, "height": 210 },
       "binding": {
         "side": "left",
-        "holes": { "count": 6, "diameter": 5, "pitch": 19, "offsetFromEdge": 7, "centered": true },
+        "holes": { "count": 6, "diameter": 5.5, "pitch": 19, "gaps": [19, 19, 70, 19, 19], "offsetFromEdge": 7, "centered": true },
         "keepOutPadding": 2
+      }
+    },
+    {
+      "id": "a5-6-51",
+      "name": { "ru": "A5, 6 колец 19-19-51-19-19", "en": "A5, 6 rings 19-19-51-19-19" },
+      "source": "hjreggel.net: Tempus, Mulberry, Quo Vadis 21",
+      "verify": true,
+      "page": { "width": 148, "height": 210 },
+      "binding": {
+        "side": "left",
+        "holes": { "count": 6, "diameter": 5.5, "pitch": 19, "gaps": [19, 19, 51, 19, 19], "offsetFromEdge": 7, "centered": true },
+        "keepOutPadding": 2
+      }
+    },
+    {
+      "id": "a5-4-45-65",
+      "name": { "ru": "A5, 4 кольца 45-65-45", "en": "A5, 4 rings 45-65-45" },
+      "source": "hjreggel.net: «various»",
+      "verify": true,
+      "page": { "width": 148, "height": 210 },
+      "binding": {
+        "side": "left",
+        "holes": { "count": 4, "diameter": 5.5, "pitch": 45, "gaps": [45, 65, 45], "offsetFromEdge": 7, "centered": true },
+        "keepOutPadding": 2
+      }
+    },
+    {
+      "id": "a5-4-40-80",
+      "name": { "ru": "A5, 4 кольца 40-80-40", "en": "A5, 4 rings 40-80-40" },
+      "source": "hjreggel.net: Org-Verlag",
+      "verify": true,
+      "page": { "width": 148, "height": 210 },
+      "binding": {
+        "side": "left",
+        "holes": { "count": 4, "diameter": 5.5, "pitch": 40, "gaps": [40, 80, 40], "offsetFromEdge": 7, "centered": true },
+        "keepOutPadding": 2
+      }
+    },
+    {
+      "id": "personal-6",
+      "name": { "ru": "Personal, 6 колец 19-19-51-19-19", "en": "Personal, 6 rings 19-19-51-19-19" },
+      "source": "hjreggel.net: Filofax Personal, Quo Vadis 17, Day-Timer Portable. Лист 95 × 171",
+      "verify": true,
+      "page": { "width": 95, "height": 171 },
+      "binding": {
+        "side": "left",
+        "holes": { "count": 6, "diameter": 5.5, "pitch": 19, "gaps": [19, 19, 51, 19, 19], "offsetFromEdge": 7, "centered": true },
+        "keepOutPadding": 2
+      }
+    },
+    {
+      "id": "pocket-6",
+      "name": { "ru": "Pocket, 6 колец (шаг 19)", "en": "Pocket, 6 rings (19 pitch)" },
+      "source": "hjreggel.net: Filofax Pocket, Chronoplan Mini. Лист 81 × 120",
+      "verify": true,
+      "page": { "width": 81, "height": 120 },
+      "binding": {
+        "side": "left",
+        "holes": { "count": 6, "diameter": 5, "pitch": 19, "offsetFromEdge": 6, "centered": true },
+        "keepOutPadding": 1.5
+      }
+    },
+    {
+      "id": "mini-5",
+      "name": { "ru": "Mini, 5 колец (шаг 19)", "en": "Mini, 5 rings (19 pitch)" },
+      "source": "hjreggel.net: Filofax Mini, Quo Vadis 11, Herlitz A8. Лист 67 × 105",
+      "verify": true,
+      "page": { "width": 67, "height": 105 },
+      "binding": {
+        "side": "left",
+        "holes": { "count": 5, "diameter": 4.5, "pitch": 19, "offsetFromEdge": 6, "centered": true },
+        "keepOutPadding": 1.5
       }
     }
   ]

@@ -121,3 +121,21 @@ test('переключение языка', async ({ page }) => {
   await page.getByRole('button', { name: 'EN' }).click();
   await expect(page.getByRole('button', { name: 'Text' })).toBeVisible();
 });
+
+test('тема: система → светлая → тёмная, сохраняется после перезагрузки', async ({ page }) => {
+  const html = page.locator('html');
+  await expect(html).not.toHaveAttribute('data-theme');
+  await page.getByRole('button', { name: 'Тема: как в системе' }).click();
+  await expect(html).toHaveAttribute('data-theme', 'light');
+  await page.getByRole('button', { name: 'Тема: светлая' }).click();
+  await expect(html).toHaveAttribute('data-theme', 'dark');
+  const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+  expect(bg).toBe('rgb(23, 25, 29)');
+  // Страница на холсте остаётся белой.
+  const pageBg = await page.locator('.page-surface').first().evaluate((e) => getComputedStyle(e).backgroundColor);
+  expect(pageBg).toBe('rgb(255, 255, 255)');
+  await page.reload();
+  await expect(html).toHaveAttribute('data-theme', 'dark');
+  await page.getByRole('button', { name: 'Тема: тёмная' }).click();
+  await expect(html).not.toHaveAttribute('data-theme');
+});

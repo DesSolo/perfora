@@ -28,6 +28,15 @@ export interface ViewPrefs {
   spread: boolean;
 }
 
+export type Theme = 'system' | 'light' | 'dark';
+export const THEMES: readonly Theme[] = ['system', 'light', 'dark'];
+
+/** Фиксированная тема ставится атрибутом data-theme на <html>, system его снимает. */
+export function applyTheme(theme: Theme): void {
+  if (theme === 'system') delete document.documentElement.dataset.theme;
+  else document.documentElement.dataset.theme = theme;
+}
+
 const DEFAULT_VIEW: ViewPrefs = { margins: true, holes: true, keepOut: true, grid: false, snap: true, spread: false };
 
 function loadJson<T>(key: string, fallback: T): T {
@@ -60,6 +69,7 @@ export interface EditorState {
   editingBlockId: string | null;
   zoom: number;
   lang: Lang;
+  theme: Theme;
   imageDpi: number;
   downscaleImages: boolean;
   /** Сообщение об ошибке для показа пользователю. */
@@ -97,6 +107,7 @@ export interface EditorState {
   setEditing(id: string | null): void;
   setZoom(z: number): void;
   setLang(l: Lang): void;
+  setTheme(t: Theme): void;
   setImageImport(opts: { dpi?: number; downscale?: boolean }): void;
   setNotice(msg: string | null): void;
   setView(patch: Partial<ViewPrefs>): void;
@@ -159,6 +170,7 @@ export const useEditor = create<EditorState>()((set, get) => {
     editingBlockId: null,
     zoom: 1,
     lang: detectLang(),
+    theme: THEMES.find((t) => t === loadJson<unknown>('perfora.theme', 'system')) ?? 'system',
     imageDpi: 300,
     downscaleImages: true,
     notice: null,
@@ -245,6 +257,11 @@ export const useEditor = create<EditorState>()((set, get) => {
     setLang(lang) {
       saveLang(lang);
       set({ lang });
+    },
+    setTheme(theme) {
+      saveJson('perfora.theme', theme);
+      applyTheme(theme);
+      set({ theme });
     },
     setImageImport({ dpi, downscale }) {
       set((s) => ({ imageDpi: dpi ?? s.imageDpi, downscaleImages: downscale ?? s.downscaleImages }));

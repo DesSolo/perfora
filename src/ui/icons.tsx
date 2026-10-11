@@ -37,6 +37,9 @@ const PATHS = {
   download: 'M12 4v11M7 10l5 5 5-5M5 20h14',
   upload: 'M12 15V4M7 9l5-5 5 5M5 20h14',
   eye: 'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z',
+  sun: 'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4',
+  moon: 'M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z',
+  themeAuto: 'M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16zM12 4v16M12 8h4M12 12h6M12 16h4',
 } as const;
 
 export type IconName = keyof typeof PATHS;

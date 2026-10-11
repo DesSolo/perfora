@@ -8,6 +8,7 @@ import {
   contentBox,
   hitsKeepOut,
   holeCenters,
+  holeGaps,
   pageMargins,
   requiredFlip,
 } from './binding';
@@ -18,7 +19,7 @@ function project(binding: Partial<Binding> = {}, holes: Partial<Binding['holes']
     ...p,
     page: { width: 148, height: 210 },
     margins: { inner: 15, outer: 8, top: 10, bottom: 12 },
-    binding: { ...p.binding, enabled: true, ...binding, holes: { ...p.binding.holes, ...holes } },
+    binding: { ...p.binding, enabled: true, ...binding, holes: { ...p.binding.holes, gaps: undefined, ...holes } },
   };
 }
 
@@ -79,6 +80,24 @@ describe('отверстия', () => {
     const p = project({ side: 'top', mirror: 'duplex' }, { count: 2, pitch: 80, offsetFromEdge: 6, centered: true });
     expect(holeCenters(0, p).map(({ x, y }) => [x, y])).toEqual([[34, 6], [114, 6]]);
     expect(holeCenters(1, p).map(({ x, y }) => [x, y])).toEqual([[34, 204], [114, 204]]);
+  });
+
+  it('неравные промежутки: 19-19-70-19-19 по центру A5', () => {
+    const p = project({ side: 'left' }, { count: 6, gaps: [19, 19, 70, 19, 19], offsetFromEdge: 7, centered: true });
+    // Размах 146 мм, начало (210 − 146) / 2 = 32.
+    expect(holeCenters(0, p).map((h) => h.y)).toEqual([32, 51, 70, 140, 159, 178]);
+  });
+
+  it('неравные промежутки на обороте совпадают на просвет', () => {
+    const p = project({ side: 'left', mirror: 'duplex' }, { count: 4, gaps: [45, 65, 45], centered: false, firstHoleOffset: 20 });
+    const front = holeCenters(0, p);
+    expect(holeCenters(1, p)).toEqual(front.map((h) => ({ ...h, x: p.page.width - h.x })));
+    expect(front.map((h) => h.y)).toEqual([20, 65, 130, 175]);
+  });
+
+  it('промежутки не по числу отверстий — равный шаг', () => {
+    expect(holeGaps({ count: 3, pitch: 10, gaps: [1, 2, 3], diameter: 5, offsetFromEdge: 7, centered: true })).toEqual([10, 10]);
+    expect(holeGaps({ count: 0, pitch: 10, diameter: 5, offsetFromEdge: 7, centered: true })).toEqual([]);
   });
 
   it('выключенный переплёт — без отверстий', () => {

@@ -1,35 +1,26 @@
 :root {
-  --bg: #eceef1;
-  --panel: #ffffff;
-  --panel-2: #f5f6f8;
-  --border: #d9dce1;
-  --text: #1d2025;
-  --muted: #6b717c;
-  --accent: #2f6fed;
-  --accent-soft: #e2ebfd;
-  --danger: #d33a3a;
-  --canvas: #d7dade;
-  --page-shadow: 0 1px 3px rgba(0, 0, 0, 0.18), 0 6px 18px rgba(0, 0, 0, 0.1);
-  --warning: #b45309;
+  /* Тема: system по умолчанию, data-theme на <html> фиксирует светлую или тёмную. */
+  color-scheme: light dark;
+  --bg: light-dark(#eceef1, #17191d);
+  --panel: light-dark(#ffffff, #1f2227);
+  --panel-2: light-dark(#f5f6f8, #262a30);
+  --border: light-dark(#d9dce1, #353a42);
+  --text: light-dark(#1d2025, #e6e8eb);
+  --muted: light-dark(#6b717c, #9399a3);
+  --accent: light-dark(#2f6fed, #5b8ef5);
+  --accent-soft: light-dark(#e2ebfd, #24324d);
+  --danger: light-dark(#d33a3a, #ef6363);
+  --canvas: light-dark(#d7dade, #2a2d33);
+  --page-shadow: 0 1px 3px light-dark(rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.5)), 0 6px 18px light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.4));
+  --warning: light-dark(#b45309, #f59e0b);
+}
+
+:root[data-theme='light'] {
   color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #17191d;
-    --panel: #1f2227;
-    --panel-2: #262a30;
-    --border: #353a42;
-    --text: #e6e8eb;
-    --muted: #9399a3;
-    --accent: #5b8ef5;
-    --accent-soft: #24324d;
-    --danger: #ef6363;
-    --canvas: #2a2d33;
-    --page-shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 6px 18px rgba(0, 0, 0, 0.4);
-    --warning: #f59e0b;
-    color-scheme: dark;
-  }
+:root[data-theme='dark'] {
+  color-scheme: dark;
 }
 
 * {
@@ -294,6 +285,10 @@ select {
   border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--panel-2);
+}
+
+.field input[aria-invalid='true'] {
+  border-color: var(--danger);
 }
 
 .field input[type='color'] {

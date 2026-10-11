@@ -3,7 +3,7 @@
 
 export type Mm = number;
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 export interface Project {
   schemaVersion: number;
@@ -34,6 +34,11 @@ export interface Binding {
     count: number;
     diameter: Mm;
     pitch: Mm;
+    /**
+     * Неравные промежутки между центрами соседних отверстий (count − 1 значений),
+     * например 19-19-70-19-19 у органайзеров A5. Если задано, `pitch` не используется.
+     */
+    gaps?: Mm[];
     offsetFromEdge: Mm;
     firstHoleOffset?: Mm;
     centered: boolean;

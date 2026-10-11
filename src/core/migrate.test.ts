@@ -56,6 +56,21 @@ describe('parseProject', () => {
     expect(hasIssues(issues)).toBe(false);
   });
 
+  it('1 → 2: проект с равным шагом открывается без изменений геометрии', () => {
+    const raw = { schemaVersion: 1, binding: { holes: { count: 4, pitch: 45, diameter: 5, offsetFromEdge: 10, centered: true } }, pages: [] };
+    const { project } = parseProject(raw);
+    expect(project.schemaVersion).toBe(SCHEMA_VERSION);
+    expect(project.binding.holes).toEqual({ count: 4, pitch: 45, diameter: 5, offsetFromEdge: 10, centered: true });
+  });
+
+  it('промежутки: берутся, только если их count − 1 и все положительные', () => {
+    const holes = (h: object) => parseProject({ schemaVersion: 2, binding: { holes: h }, pages: [] }).project.binding.holes;
+    expect(holes({ count: 4, gaps: [45, 65, 45] }).gaps).toEqual([45, 65, 45]);
+    expect(holes({ count: 5, gaps: [45, 65, 45] })).not.toHaveProperty('gaps');
+    expect(holes({ count: 4, gaps: [45, -1, 45] })).not.toHaveProperty('gaps');
+    expect(holes({ count: 4, gaps: 'x' })).not.toHaveProperty('gaps');
+  });
+
   it('без pages — invalid', () => {
     expect(() => parseProject({ schemaVersion: 1 })).toThrow(expect.objectContaining({ code: 'invalid' }) as Error);
   });

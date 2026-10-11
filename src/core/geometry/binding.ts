@@ -74,25 +74,34 @@ export function contentBox(index: number, p: Pick<Project, 'page' | 'margins' | 
   };
 }
 
+/** Промежутки между соседними отверстиями: `gaps`, если их ровно count − 1, иначе равный шаг. */
+export function holeGaps(holes: Binding['holes']): Mm[] {
+  const n = Math.max(0, holes.count - 1);
+  return holes.gaps?.length === n ? holes.gaps : Array.from({ length: n }, () => holes.pitch);
+}
+
 /**
  * Центры отверстий. Вдоль кромки: по центру или от начала кромки (верх для бокового
  * переплёта, левый край для верхнего). Переворот вокруг кромки переплёта этот отсчёт сохраняет.
  */
 export function holeCenters(index: number, p: Pick<Project, 'page' | 'binding'>): Hole[] {
   const { binding, page } = p;
-  const { count, pitch, diameter, offsetFromEdge, centered, firstHoleOffset } = binding.holes;
+  const { count, diameter, offsetFromEdge, centered, firstHoleOffset } = binding.holes;
   if (!binding.enabled || count <= 0) return [];
   const edge = bindingEdge(index, binding);
   const vertical = edge === 'left' || edge === 'right';
   const length = vertical ? page.height : page.width;
-  const start = centered ? (length - (count - 1) * pitch) / 2 : (firstHoleOffset ?? 0);
+  const gaps = holeGaps(binding.holes);
+  const span = gaps.reduce((a, g) => a + g, 0);
+  const start = centered ? (length - span) / 2 : (firstHoleOffset ?? 0);
   const across =
     edge === 'left' || edge === 'top'
       ? offsetFromEdge
       : (vertical ? page.width : page.height) - offsetFromEdge;
   const r = diameter / 2;
+  let along = start;
   return Array.from({ length: count }, (_, i) => {
-    const along = start + i * pitch;
+    if (i > 0) along += gaps[i - 1];
     return vertical ? { x: across, y: along, r } : { x: along, y: across, r };
   });
 }

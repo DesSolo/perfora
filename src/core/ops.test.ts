@@ -9,6 +9,7 @@ import {
   movePage,
   removeBlock,
   reorderBlock,
+  setBinding,
   updateBlock,
   usedAssetIds,
 } from './ops';
@@ -105,5 +106,25 @@ describe('блоки', () => {
     p = addBlock(p, p.pages[0].id, createImageBlock('a1'));
     p = addBlock(p, p.pages[0].id, createTextBlock());
     expect([...usedAssetIds(p)]).toEqual(['a1']);
+  });
+});
+
+describe('промежутки отверстий', () => {
+  const uniform = () => setBinding(createProject(), { holes: { count: 4, pitch: 45, gaps: undefined } });
+
+  it('без промежутков поле gaps отсутствует', () => {
+    expect(uniform().binding.holes).not.toHaveProperty('gaps');
+  });
+
+  it('промежутки задают число отверстий', () => {
+    const p = setBinding(uniform(), { holes: { gaps: [19, 19, 70, 19, 19] } });
+    expect(p.binding.holes.count).toBe(6);
+  });
+
+  it('смена числа отверстий дополняет последним промежутком или обрезает', () => {
+    const p = setBinding(uniform(), { holes: { gaps: [45, 65, 45] } });
+    expect(setBinding(p, { holes: { count: 6 } }).binding.holes.gaps).toEqual([45, 65, 45, 45, 45]);
+    expect(setBinding(p, { holes: { count: 2 } }).binding.holes.gaps).toEqual([45]);
+    expect(setBinding(p, { holes: { count: 1 } }).binding.holes).not.toHaveProperty('gaps');
   });
 });

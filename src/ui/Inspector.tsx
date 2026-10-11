@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useEffect, useId, useState, type ReactNode } from 'react';
 import { FONTS } from '../core/defaults';
 import type { Block, ImageFit, TextAlign, TextBlock, TextStyle } from '../core/model';
 import * as ops from '../core/ops';
@@ -12,6 +12,7 @@ import { cropMarks, hasBackSides, maxGrid, printSheetSize, sheetLayout, sheetSiz
 import { useEditor, useProject, useT } from '../store/editor';
 import { Icon, type IconName } from './icons';
 import { NumberField } from './NumberField';
+import { formatGaps, parseGaps } from '../core/gapsText';
 
 function Section({ title, children, collapsible }: { title: string; children: ReactNode; collapsible?: boolean }) {
   if (collapsible) {
@@ -269,11 +270,22 @@ function BindingSection() {
           <option value="custom" disabled={!!current}>
             {t('binding.custom')}
           </option>
-          {presets.map((p) => (
-            <option key={p.id} value={p.id}>
-              {presetName(p, lang)}
-            </option>
-          ))}
+          <optgroup label={t('binding.builtin')}>
+            {BUILTIN_PRESETS.map((p) => (
+              <option key={p.id} value={p.id}>
+                {presetName(p, lang)}
+              </option>
+            ))}
+          </optgroup>
+          {userPresets.length > 0 && (
+            <optgroup label={t('binding.mine')}>
+              {userPresets.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {presetName(p, lang)}
+                </option>
+              ))}
+            </optgroup>
+          )}
         </select>
       </label>
       {current?.verify && <p className="warning">{t('binding.verify')}</p>}
@@ -319,9 +331,23 @@ function BindingSection() {
         <NumberField label={t('holes.diameter')} value={holes.diameter} min={0.5} max={50} step={0.5} disabled={off} onChange={(v) => set({ holes: { diameter: v } }, 'diameter')} />
       </div>
       <div className="field-row">
-        <NumberField label={t('holes.pitch')} value={holes.pitch} min={0} max={1000} step={0.5} disabled={off} onChange={(v) => set({ holes: { pitch: v } }, 'pitch')} />
+        {!holes.gaps && (
+          <NumberField label={t('holes.pitch')} value={holes.pitch} min={0} max={1000} step={0.5} disabled={off} onChange={(v) => set({ holes: { pitch: v } }, 'pitch')} />
+        )}
         <NumberField label={t('holes.offset')} value={holes.offsetFromEdge} min={0} max={100} step={0.5} disabled={off} onChange={(v) => set({ holes: { offsetFromEdge: v } }, 'offset')} />
       </div>
+      <label className="check">
+        <input
+          type="checkbox"
+          checked={!!holes.gaps}
+          disabled={off || holes.count < 2}
+          onChange={(e) =>
+            set({ holes: { gaps: e.target.checked ? Array.from({ length: holes.count - 1 }, () => holes.pitch) : undefined } }, 'uneven')
+          }
+        />
+        <span>{t('holes.uneven')}</span>
+      </label>
+      {holes.gaps && <GapsField label={t('holes.gaps')} gaps={holes.gaps} disabled={off} onChange={(gaps) => set({ holes: { gaps } }, 'gaps')} />}
       <label className="check">
         <input type="checkbox" checked={holes.centered} disabled={off} onChange={(e) => set({ holes: { centered: e.target.checked } }, 'centered')} />
         <span>{t('holes.centered')}</span>
@@ -331,6 +357,39 @@ function BindingSection() {
       )}
       <NumberField label={t('holes.keepOut')} value={binding.keepOutPadding} min={0} max={50} step={0.5} disabled={off} onChange={(v) => set({ keepOutPadding: v }, 'keepout')} />
     </Section>
+  );
+}
+
+/** Промежутки текстом «19-19-70-19-19»: применяются по мере ввода, пока ввод корректен. */
+function GapsField({ label, gaps, disabled, onChange }: { label: string; gaps: number[]; disabled?: boolean; onChange: (g: number[]) => void }) {
+  const id = useId();
+  const [text, setText] = useState(formatGaps(gaps));
+  const [focused, setFocused] = useState(false);
+  useEffect(() => {
+    if (!focused) setText(formatGaps(gaps));
+  }, [gaps, focused]);
+  const valid = parseGaps(text) !== null;
+  return (
+    <label className="field" htmlFor={id}>
+      <span>{label}</span>
+      <input
+        id={id}
+        type="text"
+        inputMode="decimal"
+        placeholder="19-19-70-19-19"
+        value={text}
+        disabled={disabled}
+        aria-invalid={!valid}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
+        onChange={(e) => {
+          setText(e.target.value);
+          const g = parseGaps(e.target.value);
+          if (g) onChange(g);
+        }}
+      />
+    </label>
   );
 }
 

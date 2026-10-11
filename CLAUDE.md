@@ -39,4 +39,4 @@ Unit tests run in the `node` environment. Tests that need the DOM (DOMPurify) st
 ## Conventions
 
 - Comments and test names are in Russian; keep it that way.
-- Binding presets (ring/disc hole layouts) must live in a data file (`presets.json`), not code. Real dimensions come from the owner's measurements. Until then, only "Custom" plus one A5/6-hole test preset marked "проверить".
+- Binding presets (ring/disc hole layouts) must live in a data file (`presets.json`), not code. Each preset carries a `source`; presets whose dimensions (usually the edge offset) are not from a published standard are marked `verify` until the owner measures a real binder. Uneven layouts (3 + 3 groups) use `holes.gaps`; `holeGaps()` in `core/geometry/binding.ts` is the single place that resolves gaps vs `pitch`.

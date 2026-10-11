@@ -144,7 +144,17 @@ export function setBinding(p: Project, patch: BindingPatch): Project {
   return produce(p, (d) => {
     const { holes, ...rest } = patch;
     Object.assign(d.binding, rest);
-    if (holes) Object.assign(d.binding.holes, holes);
+    if (!holes) return;
+    const h = d.binding.holes;
+    Object.assign(h, holes);
+    // Промежутки всегда согласованы с числом отверстий: count = gaps.length + 1.
+    if (holes.gaps) {
+      h.count = holes.gaps.length + 1;
+    } else if (h.gaps && holes.count !== undefined) {
+      const last = h.gaps[h.gaps.length - 1] ?? h.pitch;
+      h.gaps = Array.from({ length: Math.max(0, h.count - 1) }, (_, i) => h.gaps![i] ?? last);
+    }
+    if (!h.gaps?.length) delete h.gaps;
   });
 }
 

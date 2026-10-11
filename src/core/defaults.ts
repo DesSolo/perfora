@@ -27,7 +27,8 @@ export function createProject(name = ''): Project {
       enabled: true,
       side: 'left',
       mirror: 'duplex',
-      holes: { count: 6, diameter: 5, pitch: 19, offsetFromEdge: 7, centered: true },
+      // Как пресет a5-6-70 (Filofax A5).
+      holes: { count: 6, diameter: 5.5, pitch: 19, gaps: [19, 19, 70, 19, 19], offsetFromEdge: 7, centered: true },
       keepOutPadding: 2,
     },
     print: {
