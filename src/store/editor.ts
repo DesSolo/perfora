@@ -162,14 +162,14 @@ export const useEditor = create<EditorState>()((set, get) => {
     imageDpi: 300,
     downscaleImages: true,
     notice: null,
-    view: { ...DEFAULT_VIEW, ...loadJson<Partial<ViewPrefs>>('ris.view', {}) },
+    view: { ...DEFAULT_VIEW, ...loadJson<Partial<ViewPrefs>>('perfora.view', {}) },
     guides: null,
     printing: false,
     printTarget: 'project',
     printJob: DEFAULT_JOB,
     previewOpen: false,
     calibrationOpen: false,
-    userPresets: loadJson<unknown[]>('ris.presets', []).filter(isValidPreset),
+    userPresets: loadJson<unknown[]>('perfora.presets', []).filter(isValidPreset),
     gestureBase: null,
     lastCommit: null,
 
@@ -254,7 +254,7 @@ export const useEditor = create<EditorState>()((set, get) => {
     },
     setView(patch) {
       const view = { ...get().view, ...patch };
-      saveJson('ris.view', view);
+      saveJson('perfora.view', view);
       set({ view });
     },
     setGuides(guides) {
@@ -275,12 +275,12 @@ export const useEditor = create<EditorState>()((set, get) => {
     saveUserPreset(name) {
       const preset = presetFromBinding(newId('u'), name, project().binding);
       const userPresets = [...get().userPresets, preset];
-      saveJson('ris.presets', userPresets);
+      saveJson('perfora.presets', userPresets);
       set({ userPresets });
     },
     deleteUserPreset(id) {
       const userPresets = get().userPresets.filter((p) => p.id !== id);
-      saveJson('ris.presets', userPresets);
+      saveJson('perfora.presets', userPresets);
       set({ userPresets });
     },
 

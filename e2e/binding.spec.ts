@@ -18,8 +18,8 @@ type Win = {
 /** Проект A5 с 6 отверстиями, зеркалированием и n страницами с текстом. */
 async function setup(page: Page, pages = 3) {
   await page.addInitScript(() => {
-    localStorage.setItem('ris.lang', 'ru');
-    localStorage.removeItem('ris.view');
+    localStorage.setItem('perfora.lang', 'ru');
+    localStorage.removeItem('perfora.view');
   });
   await page.goto('/');
   await page.evaluate((n) => {

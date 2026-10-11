@@ -1,5 +1,5 @@
 export const ru = {
-  'app.title': 'Ring Insert Studio',
+  'app.title': 'Perfora',
   'project.untitled': 'Без названия',
   'project.name': 'Название проекта',
   'action.undo': 'Отменить',
@@ -177,7 +177,7 @@ export const ru = {
   'save.failed': 'Не удалось сохранить проект в браузере. Экспортируйте его в .zip, чтобы не потерять.',
   'save.auto': 'Проект сохраняется автоматически',
   'load.imported': 'Открыт проект «{name}»',
-  'load.invalid': 'Файл не похож на проект Ring Insert Studio',
+  'load.invalid': 'Файл не похож на проект Perfora',
   'load.newer': 'Проект создан в более новой версии приложения',
   'load.failed': 'Не удалось открыть проект',
   'load.missingAssets': 'Не найдено картинок: {n}',

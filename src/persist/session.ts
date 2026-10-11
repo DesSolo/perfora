@@ -12,7 +12,7 @@ import * as db from './db';
 import { exportZip, importZip, nameFromFile, pruneAssets, zipFileName } from './zip';
 
 const SAVE_DELAY_MS = 500;
-const LAST_KEY = 'ris.lastProject';
+const LAST_KEY = 'perfora.lastProject';
 
 /** Что уже лежит в базе для текущего проекта. `project: null` — ещё ни разу не сохранён. */
 let persisted: { projectId: string; project: Project | null; assets: Set<string> } = {

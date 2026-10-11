@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { makePng, project } from './helpers';
 
 test.beforeEach(async ({ page }) => {
-  await page.addInitScript(() => localStorage.setItem('ris.lang', 'ru'));
+  await page.addInitScript(() => localStorage.setItem('perfora.lang', 'ru'));
   await page.goto('/');
 });
 

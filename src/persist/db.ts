@@ -5,7 +5,7 @@
 
 import type { Project } from '../core/model';
 
-const DB_NAME = 'ring-insert-studio';
+const DB_NAME = 'perfora';
 const DB_VERSION = 1;
 
 export interface ProjectSummary {

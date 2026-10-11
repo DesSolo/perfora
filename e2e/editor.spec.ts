@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { makePng, project, selectedId } from './helpers';
 
 test.beforeEach(async ({ page }) => {
-  await page.addInitScript(() => localStorage.setItem('ris.lang', 'ru'));
+  await page.addInitScript(() => localStorage.setItem('perfora.lang', 'ru'));
   await page.goto('/');
 });
 

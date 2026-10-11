@@ -14,7 +14,7 @@ export function translate(lang: Lang, key: MessageKey, params?: Record<string, s
 
 export function detectLang(): Lang {
   try {
-    const saved = localStorage.getItem('ris.lang');
+    const saved = localStorage.getItem('perfora.lang');
     if (saved === 'ru' || saved === 'en') return saved;
   } catch {
     // localStorage недоступен (приватный режим) — берём язык браузера.
@@ -24,7 +24,7 @@ export function detectLang(): Lang {
 
 export function saveLang(lang: Lang): void {
   try {
-    localStorage.setItem('ris.lang', lang);
+    localStorage.setItem('perfora.lang', lang);
   } catch {
     // не критично
   }

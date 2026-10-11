@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-Ring Insert Studio: a client-only SPA for laying out and printing ring/disc-binder inserts. The full spec is in Russian and lives outside the repo; README.md tracks milestone status (M1–M5), what is done, and deliberate deviations from the spec. Update README after each milestone.
+Perfora: a client-only SPA for laying out and printing ring/disc-binder inserts. The full spec is in Russian and lives outside the repo; README.md tracks milestone status (M1–M5), what is done, and deliberate deviations from the spec. Update README after each milestone.
 
 ## Commands
 

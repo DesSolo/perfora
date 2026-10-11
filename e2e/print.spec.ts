@@ -18,8 +18,8 @@ const MM = 96 / 25.4;
 /** Проект A5 с зеркалированием и n страницами. */
 async function setup(page: Page, pages: number) {
   await page.addInitScript(() => {
-    localStorage.setItem('ris.lang', 'ru');
-    localStorage.removeItem('ris.view');
+    localStorage.setItem('perfora.lang', 'ru');
+    localStorage.removeItem('perfora.view');
   });
   await page.goto('/');
   await page.evaluate((n) => {

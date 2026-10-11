@@ -1,7 +1,7 @@
 import type { MessageKey } from './ru';
 
 export const en: Record<MessageKey, string> = {
-  'app.title': 'Ring Insert Studio',
+  'app.title': 'Perfora',
   'project.untitled': 'Untitled',
   'project.name': 'Project name',
   'action.undo': 'Undo',
@@ -179,7 +179,7 @@ export const en: Record<MessageKey, string> = {
   'save.failed': 'Could not save the project in the browser. Export it to .zip so it is not lost.',
   'save.auto': 'The project is saved automatically',
   'load.imported': 'Opened project “{name}”',
-  'load.invalid': 'The file does not look like a Ring Insert Studio project',
+  'load.invalid': 'The file does not look like a Perfora project',
   'load.newer': 'The project was created in a newer version of the app',
   'load.failed': 'Could not open the project',
   'load.missingAssets': 'Images not found: {n}',
