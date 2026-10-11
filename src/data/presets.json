@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "binding": [
+    {
+      "id": "test-a5-6",
+      "name": { "ru": "A5, 6 отверстий (проверить)", "en": "A5, 6 holes (to verify)" },
+      "verify": true,
+      "page": { "width": 148, "height": 210 },
+      "binding": {
+        "side": "left",
+        "holes": { "count": 6, "diameter": 5, "pitch": 19, "offsetFromEdge": 7, "centered": true },
+        "keepOutPadding": 2
+      }
+    }
+  ]
+}
